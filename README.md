@@ -1,2 +1,4 @@
 # Jetpack-Room-Example
-안드로이드 스튜디오의 손쉬운 UI 변경을 위한 JetPack의 Navigation 이용 예제입니다.
+![imge](https://img.shields.io/badge/ProjectType-SingleStudy-green) ![imge](https://img.shields.io/badge/Language-Kotlin-yellow) ![imge](https://img.shields.io/badge/Tools-AndroidStudio-blue)
+
+안드로이드의 내부 DB를 편리하게 사용하기 위한 JetPack의 Room 이용 예제입니다.
