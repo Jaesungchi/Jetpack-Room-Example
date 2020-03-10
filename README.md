@@ -3,6 +3,8 @@
 
 안드로이드의 내부 DB를 편리하게 사용하기 위한 JetPack의 Room 이용 예제입니다.
 
+간단하게 한줄씩 글을 적는 게시판을 만들며 Room을 익혀보겠습니다.
+
 ## 0. 시작
 
 ### Room 이란?
@@ -41,3 +43,42 @@ implementation "androidx.room:room-coroutines:$room_version"
 testImplementation "androidx.room:room-testing:$room_version"
 ```
 
+## 2. ROOM 구성요소 생성
+
+### (1) Database 생성
+
+*AppDatabase.kt
+
+```kotlin
+@Database(entities = [WriteDataEntity::class],version = 1,exportSchema = false)
+abstract class AppDatabase : RoomDatabase(){
+    abstract fun WriteDao()
+    companion object{
+        private var INSTANCE : AppDatabase? = null
+        fun getInstance(context : Context): AppDatabase?{
+            if(INSTANCE == null){
+                synchronized(AppDatabase::class){
+                    INSTANCE = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java,"room_example.db").build()
+                }
+            }
+            return INSTANCE
+        }
+    }
+}
+```
+
+Database는 싱글톤을 통해 한가지 정보만 갖고 있도록 합니다. 또한 사용하는 Entity에 관해서는 위에 entities에 명시하도록 합니다.
+
+### (2) Entity 생성
+
+*writeDataEntity.kt
+
+```kotlin
+@Entity(tableName = "writeData")
+data class WriteDataEntity(@PrimaryKey(autoGenerate = true) val id:Long,
+                           var title: String,
+                           var content: String,
+                           var date : String)
+```
+
+글의 제목과 내용 그리고 날짜를 저장할 Entity를 생성합니다.
