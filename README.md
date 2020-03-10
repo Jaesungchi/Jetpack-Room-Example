@@ -82,3 +82,49 @@ data class WriteDataEntity(@PrimaryKey(autoGenerate = true) val id:Long,
 ```
 
 글의 제목과 내용 그리고 날짜를 저장할 Entity를 생성합니다.
+
+### (3) DAO 생성
+
+DAO 부분은 Interface로 작성해야합니다. 저는 Entity가 1개라 DAO도 하나면 되지만 BaseDAO를 만들어 상속받아 처리하게 하였습니다.
+
+*BaseDao.kt
+
+```kotlin
+interface BaseDao<T> {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(obj : T)
+    
+    @Delete
+    fun delete(obj : T)
+    
+    @Update(onConflict = OnConflictStrategy.ABORT)
+    fun update(obj : T)
+}
+```
+
+*WriteDateDao.kt
+
+```kotlin
+@Dao
+interface WriteDataDao : BaseDao<WriteDataEntity>{
+    @Query("SELECT * FROM writeData WHERE id = :id")
+    fun selectById(id : Int) : Maybe<WriteDataEntity>
+
+    @Query("SELECT * FROM writeData")
+    fun selectAll() : Maybe<WriteDataEntity>
+
+    @Query("SELECT * FROM writeData WHERE date = :date")
+    fun selectByDate(date : String ) : WriteDataEntity
+
+    @Query("DELETE FROM writeData WHERE date = :date")
+    fun deleteByDate(date : String)
+}
+```
+
+위를 보면 Maybe 나 Single 반환 flowable 반환형식이 존재합니다.
+
+- Maybe 타입은 행이 1개 or 0개가 오거나 Update시 success -> onComplete를 탑니다.
+- Single은 1개가 오면 success 안오면 Error를 탑니다.
+- flowable은 어떤 행도 존재하지 않을 경우 onNext나 onError를 반환하지 않습니다.
+
+[출처](https://medium.com/androiddevelopers/room-rxjava-acb0cd4f3757)
