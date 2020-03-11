@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.MainThread
+import androidx.core.view.marginLeft
 import androidx.core.view.setPadding
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -68,9 +69,9 @@ class MainActivity : AppCompatActivity() {
         addLayout.layoutParams = LinearLayout.LayoutParams(WindowManager.LayoutParams.FILL_PARENT,WindowManager.LayoutParams.WRAP_CONTENT)
         var textTmp = TextView(this@MainActivity)
         textTmp.text = "${insertData.title}  ${insertData.date}\n ${insertData.content}\n"
-        textTmp.setPadding(5,5,5,5)
         textTmp.layoutParams = LinearLayout.LayoutParams(1,WindowManager.LayoutParams.WRAP_CONTENT)
         (textTmp.layoutParams as LinearLayout.LayoutParams).weight = .8f
+        (textTmp.layoutParams as LinearLayout.LayoutParams).setMargins(60,5,5,5)
         addLayout.addView(textTmp)
         var deleteTmp = Button(this@MainActivity)
         deleteTmp.text = "삭제"
