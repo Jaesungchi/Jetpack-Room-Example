@@ -7,10 +7,10 @@ import io.reactivex.Maybe
 @Dao
 interface WriteDataDao : BaseDao<WriteDataEntity>{
     @Query("SELECT * FROM writeData WHERE id = :id")
-    fun selectById(id : Int) : Maybe<WriteDataEntity>
+    fun selectById(id : Int) : Array<WriteDataEntity>
 
     @Query("SELECT * FROM writeData")
-    fun selectAll() : Maybe<WriteDataEntity>
+    fun selectAll() : Array<WriteDataEntity>
 
     @Query("SELECT * FROM writeData WHERE date = :date")
     fun selectByDate(date : String ) : WriteDataEntity
