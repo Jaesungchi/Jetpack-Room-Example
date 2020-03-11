@@ -128,8 +128,8 @@ interface WriteDataDao : BaseDao<WriteDataEntity>{
     @Query("SELECT * FROM writeData WHERE date = :date")
     fun selectByDate(date : String ) : WriteDataEntity
 
-    @Query("DELETE FROM writeData WHERE date = :date")
-    fun deleteByDate(date : String)
+    @Query("DELETE FROM writeData WHERE id = :id")
+    fun deleteById(id : Long)
 }
 ```
 
@@ -184,17 +184,6 @@ interface WriteDataDao : BaseDao<WriteDataEntity>{
         app:layout_constraintTop_toBottomOf="@+id/titleText"
         app:layout_constraintVertical_bias="0.028" />
 
-    <LinearLayout
-        android:id="@+id/listLayout"
-        android:layout_width="416dp"
-        android:layout_height="593dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/contentText"
-        app:layout_constraintVertical_bias="1.0"></LinearLayout>
-
     <Button
         android:id="@+id/insertBtn"
         android:layout_width="109dp"
@@ -206,6 +195,24 @@ interface WriteDataDao : BaseDao<WriteDataEntity>{
         app:layout_constraintStart_toEndOf="@+id/titleText"
         app:layout_constraintTop_toTopOf="@+id/titleText"
         app:layout_constraintVertical_bias="0.0" />
+
+    <ScrollView
+        android:id="@+id/listLayout"
+        android:layout_width="416dp"
+        android:layout_height="593dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/contentText"
+        app:layout_constraintVertical_bias="1.0">
+
+        <LinearLayout
+            android:id="@+id/masterLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"></LinearLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
 
@@ -241,11 +248,14 @@ implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutineVersi
 private fun insertData(){
     if(titleText.text.isNullOrEmpty() || contentText.text.isNullOrEmpty())
         return
+    var insertTmp =WriteDataEntity(0,titleText.text.toString(), contentText.text.toString(), LocalDate.now().toString() +" "+ LocalTime.now().toString().subSequence(0,8))
     CoroutineScope(Dispatchers.IO).launch {
-        AppDatabase.getInstance(this@MainActivity)?.WriteDao()?.insert(
-            WriteDataEntity(0,titleText.text.toString(), contentText.text.toString(), LocalDate.now().toString())
-        )
+        appDatabase.WriteDao()?.insert(insertTmp)
     }
+    updateView(insertTmp)
+    titleText.text = null
+    contentText.text = null
+    closeKeyboard()
 }
 ```
 
@@ -268,6 +278,68 @@ fun updateView(){
 ```
 
 이제 데이터를 받아오는 updateView() 메소드를 만들고 잘 데이터가 들어오는지 확인합니다.
+
+잘 들어오는것이 확인 된경우 MainActivity에서 동적으로 생성할수 있도록 코드를 만듭니다.
+
+Coroutine 을 통해 데이터를 담은 후 MainThread에서 MasterLayout을 넣는것으로 동기화 문제를 해결하였습니다.
+
+*MainActivity.ky
+
+```kotlin
+private fun initView(){
+    var tmps : Array<WriteDataEntity>? = null
+    CoroutineScope(Dispatchers.IO).launch {
+        tmps = appDatabase.WriteDao()?.selectAll()
+    }
+    CoroutineScope(Dispatchers.Main).launch {
+        if (tmps != null)
+            for(i in tmps!!)
+                updateView(i)
+    }
+}
+```
+
+시작시 저장되어 있는 값들을 꺼내서 뽑아주는 메소드입니다. 여기서 값을 가져오는것은 Dispatchers.IO 즉 비동기로 가져오고 View에 출력은 MainThread를 이용해서 출력하였습니다.
+
+```kotlin
+private fun deleteData(id : Long){
+    CoroutineScope(Dispatchers.IO).launch {
+        appDatabase.WriteDao()?.deleteById(id)
+    }
+}
+```
+
+지우는 메소드입니다.
+
+```kotlin
+private fun updateView(insertData : WriteDataEntity){
+    //materLayout에 넣을 레이아웃 생성.
+    var addLayout = LinearLayout(this@MainActivity)
+    addLayout.orientation = LinearLayout.HORIZONTAL
+    addLayout.layoutParams = LinearLayout.LayoutParams(WindowManager.LayoutParams.FILL_PARENT,WindowManager.LayoutParams.WRAP_CONTENT)
+    var textTmp = TextView(this@MainActivity)
+    textTmp.text = "${insertData.title}  ${insertData.date}\n ${insertData.content}\n"
+    textTmp.setPadding(5,5,5,5)
+    textTmp.layoutParams = LinearLayout.LayoutParams(1,WindowManager.LayoutParams.WRAP_CONTENT)
+    (textTmp.layoutParams as LinearLayout.LayoutParams).weight = .8f
+    addLayout.addView(textTmp)
+    var deleteTmp = Button(this@MainActivity)
+    deleteTmp.text = "삭제"
+    deleteTmp.layoutParams = LinearLayout.LayoutParams(1,WindowManager.LayoutParams.FILL_PARENT)
+    (deleteTmp.layoutParams as LinearLayout.LayoutParams).weight = .2f
+    deleteTmp.setPadding(5,5,5,5)
+    deleteTmp.setOnClickListener {
+        deleteData(insertData.id)
+        masterLayout.removeView(addLayout)
+    }
+    addLayout.addView(deleteTmp)
+    masterLayout.addView(addLayout)
+}
+```
+
+이렇게해서 Room 연습 프로젝트 완성입니다.
+
+
 
 ## ※ISSUE
 

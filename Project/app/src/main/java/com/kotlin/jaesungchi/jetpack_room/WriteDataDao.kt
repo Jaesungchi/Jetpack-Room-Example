@@ -15,6 +15,6 @@ interface WriteDataDao : BaseDao<WriteDataEntity>{
     @Query("SELECT * FROM writeData WHERE date = :date")
     fun selectByDate(date : String ) : WriteDataEntity
 
-    @Query("DELETE FROM writeData WHERE date = :date")
-    fun deleteByDate(date : String)
+    @Query("DELETE FROM writeData WHERE id = :id")
+    fun deleteById(id : Long)
 }

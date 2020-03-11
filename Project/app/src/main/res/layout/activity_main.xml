@@ -22,28 +22,20 @@
 
     <EditText
         android:id="@+id/contentText"
-        android:layout_width="377dp"
-        android:layout_height="49dp"
+        android:layout_width="367dp"
+        android:layout_height="100dp"
         android:ems="10"
         android:hint="content"
-        android:inputType="textPersonName"
+        android:inputType="textMultiLine"
+        android:lines="3"
+        android:maxLines="3"
+        android:scrollbars="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.617"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/titleText"
         app:layout_constraintVertical_bias="0.028" />
-
-    <LinearLayout
-        android:id="@+id/listLayout"
-        android:layout_width="416dp"
-        android:layout_height="593dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/contentText"
-        app:layout_constraintVertical_bias="1.0"></LinearLayout>
 
     <Button
         android:id="@+id/insertBtn"
@@ -56,4 +48,22 @@
         app:layout_constraintStart_toEndOf="@+id/titleText"
         app:layout_constraintTop_toTopOf="@+id/titleText"
         app:layout_constraintVertical_bias="0.0" />
+
+    <ScrollView
+        android:id="@+id/listLayout"
+        android:layout_width="419dp"
+        android:layout_height="533dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/contentText"
+        app:layout_constraintVertical_bias="1.0">
+
+        <LinearLayout
+            android:id="@+id/masterLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"></LinearLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
