@@ -227,14 +227,15 @@ MainThread에서 많은 양의 쿼리를 사용하면 오랫동안 UI가 작동�
 
 ### (0) Coroutine ?
 
-코루틴은 루틴의 일종으로, 협동 루틴이라고 합니다. 보통의 루틴과 서브 루틴은 서로 비대칭적인 관계지만, 코루틴은 완전히 대칭으로, 서로가 서로를 호출하는 관계에 있습니다. 따라서 코루틴에서는 무엇이 서브루틴이고 루틴인지 구분이 불가능합니다. 그래서 코루틴은 A와 B가 있을때 A를 프로그래밍할때에는 B를 A의 서브루틴이라 생각하고, B를 할때에는 거꾸로 생각합니다.
+코루틴은 light-weight Thread로 비동기처리를 도와줍니다.
 
 코루틴을 쉽게 이용하는 방법은 launch와 async 함수를 이용하면 됩니다. 둘은 거의 동일한 기능이지만 launch는 Job을 return 하고 어떠한 값도 전달하지 않지만, async는 Deferred를 return 하면서 약속된 값을 제공하는 차이점이 있습니다. 만약 실행중인 코드가 예외적으로 종료되면 launch에서는 android 응용프로그램과 충돌하고, async는 Deferred에 저장되고 처리하지 않으면 자동적으로 삭제된다는 차이점이 있습니다. 
 
-코루틴의 dispatcher는 두가지입니다.
+코루틴을 사용할때엔 Dispatcher를 상황에 맞게 사용해야합니다.입니다.
 
-- uiDispatcher : 안드로이드 UIThread에서 실행(Dispatchers.Main)
-- bgDisPatcher : BGThread에서 실행합니다. (Dispatchers.IO)
+- Dispatcher.Main : UI Thread에서 실행
+- Dispatcher.IO : 네트워크나 , 디스크 사용을 하는것에 최적화 된 쓰레드
+- Dispatcher.Default : 매우 긴작업을 할때 적합한 쓰레드.
 
 ### (1) Dependencies 추가
 
